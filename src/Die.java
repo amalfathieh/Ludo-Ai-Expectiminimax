@@ -1,12 +1,11 @@
 import java.util.Random;
 
 public class Die {
-    private int face;
+    // نعرّف Random مرة واحدة كمتغير ثابت (Static) لأداء أفضل
+    private static final Random random = new Random();
 
-    int roll() {
-        int face = (int) (Math.random() * 6 + 1);
-        assert face>=1 && face<=6;
-        return face;
+    public int roll() {
+        // nextInt(6) تعطي رقم من 0 إلى 5، نجمع 1 ليصبح من 1 إلى 6
+        return random.nextInt(6) + 1;
     }
-
 }

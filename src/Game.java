@@ -8,15 +8,45 @@ public class Game {
     Player currentPlayer;
     Piece piece;
     int newPosition;
-    Game(List<Player> players) {
-        this.players = players;
-    }
+
     Game(Player currentPlayer, Piece piece, int newPosition){
         this.currentPlayer = currentPlayer;
         this.piece = piece;
         this.newPosition=newPosition;
     }
+    // في Game.java
+    public Game(List<Player> playersList) {
+        this.players = playersList; // تأكد من التخزين الصحيح
+    }
+    // أضف Getter لقائمة اللاعبين
+    public List<Player> getPlayers() {
+        return players;
+    }
+    // === أضف هذه الدوال في نهاية كلاس Game ===
 
+    // Getter للاعبين
+    public List<Player> getPlayersList() { return players; }
+
+    // Getter و Setter للاعب الحالي
+    public Player getCurrentPlayer() { return currentPlayer; }
+    public void setCurrentPlayerPublic(Player player) { this.currentPlayer = player; }
+
+    // دالة نهاية اللعبة (عامة)
+    public boolean checkGameOver() {
+        int count = 0;
+        for (Player player : players) {
+            if (player.hasWon()) count++;
+        }
+        return count >= players.size() - 1;
+    }
+
+    // دالة مساعدة للعثور على لاعب باللون
+    public Player findPlayerByColor(String color) {
+        for (Player p : players) {
+            if (p.getColor().equals(color)) return p;
+        }
+        return null;
+    }
     public void setCurrentPlayer(Player currentPlayer) {
         this.currentPlayer = currentPlayer;
     }
@@ -35,13 +65,17 @@ public class Game {
 
     }
 
-    boolean takeOut(Piece piece){
-        if(!piece.isOut()) {
-            Square oldSquare = currentPlayer.getHome().get(piece.getIndexPath());
+    boolean takeOut(Piece piece) {
+        if (!piece.isOut()) {
+            // الحجر في المنزل فهرسه هو (رقم الحجر - 1)
+            int homeIdx = piece.getPieceNum() - 1;
+            Square oldSquare = currentPlayer.getHome().get(homeIdx);
+
             oldSquare.removePiece(piece);
             Square newSquare = currentPlayer.getPath().get(0);
-            newSquare.setPiece(piece ,0);
+            newSquare.setPiece(piece, 0); // نضع الحجر في بداية المسار (Index 0)
             piece.setOut(true);
+            piece.setIndexPath(0); // تحديث الفهرس
             return true;
         }
         return false;
@@ -96,36 +130,26 @@ public class Game {
 
     void containsOneEnemyPiece(int x , int y) {
         for (Player player: players) {
-            if (player.getColor().equals(currentPlayer.getColor())) {
-                continue;
-            }
-            List<Square> square1 = player.getPath();
-            for (Square square2:square1){
+            if (player.getColor().equals(currentPlayer.getColor())) continue;
+
+            for (Square square2 : player.getPath()){
                 if(x == square2.getRowPosition() && y == square2.getColPosition()){
                     List<Piece> pieces = square2.getPieces();
-                    if(pieces.isEmpty()){
-                        break;
-                    }
-                    else {
-                        for (int i = 0; i < 4; i++) {
-                            Piece enemyPiece = pieces.get(i);
-                            if(enemyPiece != null){
-                                square2.removePiece(enemyPiece);
+                    if(!pieces.isEmpty()){
+                        // استخدام Iterator أو loop مرنة لتجنب الأخطاء
+                        Piece enemyPiece = pieces.get(0);
+                        square2.removePiece(enemyPiece);
 
-                                Square homeSquare = player.getHome().get(enemyPiece.getPieceNum() - 1);
-                                homeSquare.setPiece(enemyPiece, enemyPiece.getPieceNum() - 1);
-                                enemyPiece.setOut(false);
-                                break;
-                            }
-                        }
+                        Square homeSquare = player.getHome().get(enemyPiece.getPieceNum() - 1);
+                        homeSquare.setPiece(enemyPiece, enemyPiece.getPieceNum() - 1);
+                        enemyPiece.setOut(false);
+                        enemyPiece.setIndexPath(-1); // إعادة الفهرس للمنزل
                         return;
                     }
                 }
             }
         }
-
     }
-
 
     boolean movesArePossible(Player player, int numberRolled) {
         if(numberRolled==6) {

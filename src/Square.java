@@ -3,20 +3,22 @@ import java.util.List;
 
 public class Square {
 
-    private int colPosition;
-    private int rowPosition;
-    private String type;
-    private List<Piece> pieces;
-    private String letter;
-    private Player player;
+    // هذه الخصائص لا تتغير بعد إنشاء المربع، لذا جعلناها final
+    private final int rowPosition;
+    private final int colPosition;
+    private final String type;
+    private final String letter;
+    private final Player player;
+
+    private final List<Piece> pieces;
 
     public Square(Player player, int rowPosition, int colPosition, String type, String letter) {
-        this.player  = player;
+        this.player = player;
         this.rowPosition = rowPosition;
         this.colPosition = colPosition;
         this.type = type;
-        this.pieces = new ArrayList<>();
         this.letter = letter;
+        this.pieces = new ArrayList<>();
     }
 
     public int getColPosition() {
@@ -27,28 +29,34 @@ public class Square {
         return rowPosition;
     }
 
-    @Override
-    public String toString() {
-        if (pieces.isEmpty()) {
-            return letter;
-        }
-        return pieces.toString();
+    public String getType() {
+        return type;
     }
 
     public List<Piece> getPieces() {
         return this.pieces;
     }
 
-    public void setPiece(Piece piece,int indexPath) {
+    public Player getPlayer() {
+        return this.player;
+    }
+
+    public void setPiece(Piece piece, int indexPath) {
         this.pieces.add(piece);
         piece.setIndexPath(indexPath);
     }
 
-    public void removePiece(Piece piece){
+    public void removePiece(Piece piece) {
         this.pieces.remove(piece);
     }
 
-    public String getType() {
-        return type;
+    @Override
+    public String toString() {
+        // إذا كان المربع فارغاً، نطبع رمزه (مثل -- أو **)
+        if (pieces.isEmpty()) {
+            return letter;
+        }
+        // إذا كان يحتوي على قطع، نطبعها
+        return pieces.toString();
     }
 }
